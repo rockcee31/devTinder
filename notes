@@ -1,0 +1,124 @@
+// app.use("/hello",(req,res)=>{
+//     res.send("hello hello hello`")
+// });
+
+// app.get("/test/user",(req,res)=>{
+//     console.log(req.query);
+
+//     res.send("Namaste from the server")                             
+// });
+
+// app.get("/test123/:user/:password",(req,res)=>{
+//     console.log(req.params)
+//     res.send("hello from server")
+// });
+
+
+// app.use("/123",(req,res)=>{
+//     res.send("Anokhi Dastan")
+// });
+
+// app.use("/",(req,res)=>{
+//     res.send("Pikabu pikabu")
+// });
+
+// app.use("/admin",
+//     (req,res,next)=>{
+//      const token = "xyza";
+//      const isAuthenticated = token == 'xyz';
+//      if(!isAuthenticated){
+//         res.status().send("user is not authorize");
+//      }
+//      else{
+//         next();
+//      }
+// },
+//     (req,res)=>{
+//         res.send("authenticated succesfully")
+//     }
+// )
+
+//2
+
+// This middleware runs for all routes that start with /admin (including /admin/getAllData).
+// app.use("/admin",adminAuth);
+
+// app.get("/admin/getAllData",(req,res)=>{
+
+
+   
+//     res.send("data sent")
+// })
+
+// app.use((err,req,res)=>{
+//     if(err){
+//         res.status(500).send("something broke!!")
+//     }
+// })
+
+
+
+//3
+
+// middleware in express.js is basically a function that runs between req and res 
+// and allow us to perform tasks before senduing response back
+//  you can inspect modify terminate req before sending it to the client
+
+
+
+// What is Node.js?
+
+// 👉 Node.js is a runtime environment that allows you to run JavaScript outside the browser.
+
+// It provides core modules (like HTTP, FS, and Path) to build network applications.
+// You can create a web server with Node.js, but it’s low-level and requires more manual work.
+
+// const http = require('http');
+
+// const server = http.createServer((req, res) => {
+//     res.writeHead(200, { 'Content-Type': 'text/plain' });
+//     res.end('Hello, world!');
+// });
+
+// server.listen(3000, () => {
+//     console.log('Server running on port 3000');
+// });
+
+
+// . What is Express.js?
+
+// 👉 Express.js is a web framework built on top of Node.js.
+
+// It simplifies creating web servers by handling routing, middleware, error handling, and more.
+// Built-in methods like app.get, app.post, and app.use make web development much cleaner.
+
+
+
+//4
+
+/*const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => {
+    res.send('Hello, world!');
+});
+
+app.listen(3000, () => {
+    console.log('Server running on port 3000');
+});
+*/
+
+/*
+ Behind the scenes, Express calls Node.js's built-in http.createServer to create the HTTP server:
+ const http = require('http');
+const server = http.createServer((req, res) => {
+    // Express request handler goes here
+});
+server.listen(3000);
+
+*/
+
+// difference between app.use and app.all
+
+
+
