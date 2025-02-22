@@ -122,3 +122,36 @@ server.listen(3000);
 
 
 
+/* 5
+ //to put data into database 
+app.use(express.json());
+app.post("/signup",async(req,res)=>{
+    //creating new instance of User model
+    const newUser = new User(req.body)
+    try{
+    await newUser.save();
+    res.send("here we are")
+    }catch(err){
+      res.status(400).send("Error in saving the user " + err.message)
+    }
+})
+
+app.use(express.json())
+//get single user from db
+app.get("/user",async (req,res)=>{
+    const emailId = req.body
+    try{
+         const user = await User.find(emailId);
+        if(user.length == 0){
+            res.status(404).send("user not found ")
+        }else{
+            res.send(user)
+        }
+    }catch(err){
+        res.send("something went  wrong");
+    }
+})
+
+
+
+ */
