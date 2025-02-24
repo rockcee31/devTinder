@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const validator = require('validator');
 
 
 //Define schema (DOCUMENT STRUCTURE)
@@ -11,13 +11,52 @@ const userSchema = new mongoose.Schema({
     email:{
         type:String,
         required:true,
+        unique:true,
+        lowercase:true,
+        trim:true,
+        validate(value){
+            if(!validator.isEmail(value)){
+                throw new Error("add correct order of email"+value);
+            }
+        }
+    },
+    password:{
+        type:String,
+        required:true,
+        trim:true,
+        minlength:8,
+        validate(value){
+            if(!validator.isStrongPassword("please add strong password and order"+value));
+        }
+
     },
     age:{
         type:Number,
-        required: true
+      
+    },
+    gender:{
+        type:String,
+        required: true,
+        validate:{
+            validator:(value)=>{
+            return ["Male","Female","Others"].includes(value)
+            },
+            message:"gender data is not right"
+          }
+        
+    },
+    skills:{
+        type:[String],
+        validate:{
+      validator:(value)=>{
+        return value.length<=10;
+      },
+      message:"cannot add more than 10 skills"
     }
+    }
+},{
+    timestamps:true,
 })
-
 
 
 
