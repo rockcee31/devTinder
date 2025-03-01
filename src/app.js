@@ -3,18 +3,65 @@ const {adminAuth,userAuth,accountAuth} = require('./middleware/auth')
 const app= express();
 const User = require("./models/user");
 const connectDb = require("./config/database")
+const bcrypt = require('bcrypt');
+const validation = require("./utils/validation")
 
 app.use(express.json())
 app.post("/signup",async (req,res)=>{
-    const newUser = new User(req.body);
+    
     try{
-        await newUser.save()
-        res.send("user saved sucessfully")
-        
+    //validate data 
+    validation(req)
+
+    //encryption of password
+    const {emailId,password,name,age,gender} = req.body;
+    const passwordHash = bcrypt.hash(password,10);
+    console.log(passwordHash);
+
+    //put it into database
+    const user = new User({
+        name,
+        emailId,
+        password:passwordHash,
+        age,
+        gender
+
+    })
+
     }catch(err){
-         res.status(400).send("something went wrong")
+        res.send("ERROR IN SIGN UP "+ err.message);
     }
 })
+
+app.post("/login",async(req,res) =>{
+    try{
+    const {emailId,password}= req.body;
+    const isUser = await User.findOne({emailId:emailId});
+    if(!isUser){
+        throw new Error("invalid credential");
+    }
+    const itsPassword = await bcrypt.compare(password,isUser.password)
+
+    if(itsPassword){
+        //create s JWT token 
+
+        //Add the token to cookie and send the response to the user 
+
+        // when you send a response back express give you easy way to send the cookie there is method res.cookie
+        res.cookie("token","sgnodjgodo")
+
+
+
+        res.send("Login successful!!")
+    }else{
+        throw new Error("invalid credential");
+    }
+
+    }catch(err){
+        res.status(400).send("unable to log"+ err.message)
+    }
+})
+
 
 //get single user from db
 app.get("/user",async (req,res)=>{
