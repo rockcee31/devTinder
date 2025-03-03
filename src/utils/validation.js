@@ -1,5 +1,6 @@
-const validator = require('validator')
-const validation = (req) =>{
+const validator = require('validator');
+
+const validation =(req) =>{
 
     const {name,emailId,password} = req.body;
     if(!name){
@@ -10,7 +11,10 @@ const validation = (req) =>{
     }
     else if(!validator.isStrongPassword(password)){
         throw new Error("add strong password")
+    
     }
+
+    return true
 }
 
 
