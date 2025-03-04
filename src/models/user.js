@@ -16,20 +16,20 @@ const userSchema = new mongoose.Schema({
         unique:true,
         lowercase:true,
         trim:true,
-        validate(value){
-            if(!validator.isEmail(value)){
-                throw new Error("add correct order of email"+value);
-            }
-        }
+        // validate(value){
+        //     if(!validator.isEmail(value)){
+        //         throw new Error("add correct order of email"+value);
+        //     }
+        // }
     },
     password:{
         type:String,
         required:true,
         trim:true,
         minlength:8,
-        validate(value){
-            if(!validator.isStrongPassword("please add strong password and order"+value));
-        }
+        // validate(value){
+        //     if(!validator.isStrongPassword("please add strong password and order"+value));
+        // }
 
     },
     age:{

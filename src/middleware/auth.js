@@ -1,40 +1,24 @@
-const adminAuth = (req,res,next) =>{
-    console.log("authenticating starts");
+// const { request } = require('express');
+const jwt = require('jsonwebtoken')
+const User =  require('../models/user');
 
-     const token = "xyz";
-     const isAuthenticated = token == "xyz";
-     if(!isAuthenticated){
-        res.status().send("unauthorized")
-     }
-     else{
-        next();
-     }
-}
-const accountAuth = (req,res,next) =>{
-   console.log("accoount authentication started");
-   const token = "xyz";
-   const isAuthenticated = token == "xyz";
-   if(!isAuthenticated){
-      res.status().send("unauthorized")
+
+
+
+const userAuth = async(req,res,next)=>{
+   try{
+   const cookie = req.cookies;
+   const {token} = cookie;
+
+  const decodedMessage =  jwt.verify(token,"DEV@Tinder");
+  console.log(decodedMessage)
+  const {_id} = decodedMessage;
+  const user = await User.findOne({_id});
+   req.user = user;
+   next()
+   }catch(err){
+       res.status(200).send("you are not loggedIn")
    }
-   else{
-      next();
-   }
 }
 
-const userAuth = (req,res,next)=>{
-    const token = "xyz";
-    const isAuthenticated = token == "xyz";
-    if(!isAuthenticated){
-       res.status().send("unauthorized")
-    }
-    else{
-       res.send("user authorized");
-    }
-}
-
-module.exports={
-    adminAuth,
-    userAuth,
-    accountAuth
-}
+module.exports= userAuth

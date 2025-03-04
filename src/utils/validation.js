@@ -3,8 +3,8 @@ const validator = require('validator');
 const validation =(req) =>{
 
     const {name,emailId,password} = req.body;
-    if(!name){
-        throw new Error("provide name");
+    if(!name && !emailId){
+        throw new Error("provide name or email");
     }
     else if(!validator.isEmail(emailId)){
         throw new Error("add valid emailId");
@@ -14,10 +14,7 @@ const validation =(req) =>{
     
     }
 
-    return true
 }
 
 
-module.exports = {
-    validation
-}
+module.exports = validation
