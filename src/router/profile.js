@@ -4,6 +4,8 @@ const cookieParser = require("cookie-parser");
 const profileRouter = express.Router();// jo bhi profile related routes hai unko manage kar rha hai //server pe jab bhi profile related request aayegi to usse profileRouter manage karega
 const User = require("../models/user");
 const userAuth = require("../middleware/auth")
+const validateProfileEdit = require("../utils/validateProfileEdit")
+const bcrypt = require('bcrypt');
 
 
 profileRouter.get("/profile",userAuth,async(req,res)=>{
@@ -14,17 +16,32 @@ profileRouter.get("/profile",userAuth,async(req,res)=>{
     }
 })
 
-profileRouter.post("/profile/edit",userAuth,async(req,res)=>{
+profileRouter.patch("/profile/edit",userAuth,async(req,res)=>{
      try{
         validateProfileEdit(req);
         const loggedInuser = req.user;
 
        Object.keys(req.body).forEach((key)=>(loggedInuser[key] = req.body[key]));
 
-       loggedInuser.save();
+       await loggedInuser.save();
+       res.send("user updated successfully")
      }catch(err){
-         res.status(400).send("unable to edit ")
+         res.status(400).send("unable to edit "+err.message)
      }
+})
+
+profileRouter.patch("/profile/password",userAuth,async(req,res) =>{
+    const loggedInUser = req.user
+    const itsPassword = await bcrypt.compare(password,req.user.password);
+    if(itsPassword){
+        throw new Error("this is password already exist")
+    }else{
+        const passwordHash = await bcrypt.hash(password,10);
+        loggedInUser.password(passwordHash)
+        await loggedInUser.save();
+    }
+
+
 })
 module.exports={
     profileRouter

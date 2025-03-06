@@ -44,21 +44,28 @@ authRouter.post("/login",async(req,res)=>{
        if(!isUser){
          throw new Error("Invalid credential");
        }
-
+      
        const itsPassword = await bcrypt.compare(password,isUser.password)
        if(itsPassword){
           //CREATE JWT TOKEN 
           const token =  jwt.sign({_id:isUser._id},"DEV@Tinder");
           
-          //create a cookie and send this token in it .
+          //create a cookie and send this token in it.
           res.cookie("token",token);
           res.send("login successfull");
        }
     }catch(err){
-           throw new Error("invalid credential"+err.message)
+           res.send("invalid credentials")
     }
 })
 
+authRouter.post("/logout",(req,res)=>{
+    res
+    .cookie("token",null,{
+        expires: new Date(Date.now())
+    })
+    .send("logout successfull");
+})
 module.exports ={
     authRouter
 }

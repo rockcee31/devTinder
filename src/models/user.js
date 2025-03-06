@@ -16,11 +16,11 @@ const userSchema = new mongoose.Schema({
         unique:true,
         lowercase:true,
         trim:true,
-        // validate(value){
-        //     if(!validator.isEmail(value)){
-        //         throw new Error("add correct order of email"+value);
-        //     }
-        // }
+        validate(value){
+            if(!validator.isEmail(value)){
+                throw new Error("add correct order of email"+value);
+            }
+        }
     },
     password:{
         type:String,
