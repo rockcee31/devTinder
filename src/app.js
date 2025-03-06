@@ -8,7 +8,7 @@ const {validation} = require("./utils/validation")
 const {authRouter} = require("./router/auth")
 const {profileRouter} = require("./router/profile")
 const cookieParser = require('cookie-parser');
-
+const requestRouter = require("./router/request")
 app.use(express.json())
 app.use(cookieParser())
 
@@ -16,6 +16,7 @@ app.use(cookieParser())
 app.use("/",authRouter);//THIS IS MIDDLE  WARE BUT ITS NOT HANDLING ROUTE it is not modifying requests like normal middleware (e.g., authentication or logging middleware).
 
 app.use("/",profileRouter)
+app.use("/",requestRouter);
 
 // app.get("/profile",async (req,res)=>{
 //     try{

@@ -61,7 +61,6 @@ const userSchema = new mongoose.Schema({
 })
 
 
-
 //2 create model from schema (interface for the collection)
 const User = mongoose.model('User',userSchema);
 
