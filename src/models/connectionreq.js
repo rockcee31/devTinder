@@ -23,7 +23,7 @@ const connectionReqSchema = new mongoose.Schema({
    
 
 connectionReqSchema.pre("save",function(next){
-    const connectionReq = this
+    const connectionReq = this //here this refers to element which is going to save it works like that inside pre save hook 
     if(connectionReq.fromUserId.equals(connectionReq.toUserId)){
         throw new Error("can't send request to yourself")
     }

@@ -11,7 +11,7 @@ const userAuth = async(req,res,next)=>{
    const {token} = cookie;
 
   const decodedMessage =  jwt.verify(token,"DEV@Tinder");
-  console.log(decodedMessage)
+//   console.log(decodedMessage)
   const {_id} = decodedMessage;
   const user = await User.findOne({_id});
    req.user = user;
