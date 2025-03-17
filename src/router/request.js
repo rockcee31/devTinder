@@ -58,15 +58,16 @@ requestRouter.post("/request/send/:status/:toUserId",userAuth,async(req,res) =>{
 
 
 requestRouter.post("/request/review/:status/:requestId",userAuth,async(req,res)=>{  //this one is for receiver i am reveiwing connection request i can either reject it or accept it with api we are making  to create a api you have to first think of route and than miidleware 
-    try{const loggedInUser = req.user;//logginIn user is the guy who is seing the req came to him means we have to see that connection req where to userId  is of loggedIn user
-    const {status,requestId} = req.params;
+    try{
+        const loggedInUser = req.user;//logginIn user is the guy who is seing the req came to him means we have to see that connection req where to userId  is of loggedIn user
+    const {status,requestId} = req.params; //user ko request to saari dikh rahi hai jha logo ne uspe interest show kiya hai yha user jaisi he click karege accept or reject ui pe wo request aajayegi iss api pe jha requestId hogi us object ki Id 
     const allowedUpdates = ["accepted","rejected"]; //for user to  review there will to option either reject or request and also before reveiw the requset should be in intersted status than only user can accept or reject it and if connection req  in ignored state no body can accept or reject it
     if(!allowedUpdates.includes(status)){
         return res.status(400).json({message:"status not allowed"})
     }
     
     const connectedReq = await connectionReq.findOne({
-        _id: requestId, //id of request in database that from user sent to user
+        _id: requestId, //id of request in database that from user sent to user jab kisi ne user  ne request bheji hogi tab database mai ek object bana hoga req  intersted in user ab wo obj  dusre ke ui mai show hui hogi yha wo user us req id object ka status change kar rha hai either he is rejecting it or accepting it 
         toUserId : loggedInUser._id,//touser should be the login user that guy only can accept req came to him  mai loggedin user hun means data mai jha to user mai hun wo saari req mai dekh sakta hun yha mai un req ka jawab dera hun  // basically yha yeh check hora hai ki iso ko aarakhi hai na  ye request jo login ho rakha hai pta chale koi hor aake accept kar rha ho apne aap
         status:"interested", //jinhone mujhpe interest dikhaya hai
     })
@@ -97,7 +98,7 @@ developers are the  gaurd of database
 what  happens in post api(api which handle post call) user are are trying to enter some data into the database 
 ans get api(api that  handle get call) means user are trying to fetch some data from the database
 now how attackers can attack your post so they can attack your post api by sending some malicious data into your api and you mistakenly put that data into your database
-and in get api your getting some information from the database now database should be very safe now in get api we have to make sure we are sending only allowed data what ever data im sending to user i have to make sure that the user is authorised and suppose im rohit and im trying to acess the connection req  elon has that should not be allowed so we have  to make sure that loggedin user is verified user and whatever he is requesting is requesting the correct information which is allowed in his scope
+and in get api your getting some information from the database now database should be very safe now in get api we have to make sure we are sending only allowed data what ever data im sending to user i have to make sure that the user is authorised,suppose im rohit and im trying to acess the connection req  elon has that should not be allowed so we have  to make sure that loggedin user is verified user and whatever he is requesting is requesting the correct information which is allowed in his scope
 now to handle user data thing we will create user router in router file and inside it le t us first found connect request of loggedin user all the  connection req user have received
 
 "user/requests"
