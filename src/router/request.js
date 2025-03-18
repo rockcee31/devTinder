@@ -70,14 +70,18 @@ requestRouter.post("/request/review/:status/:requestId",userAuth,async(req,res)=
         _id: requestId, //id of request in database that from user sent to user jab kisi ne user  ne request bheji hogi tab database mai ek object bana hoga req  intersted in user ab wo obj  dusre ke ui mai show hui hogi yha wo user us req id object ka status change kar rha hai either he is rejecting it or accepting it 
         toUserId : loggedInUser._id,//touser should be the login user that guy only can accept req came to him  mai loggedin user hun means data mai jha to user mai hun wo saari req mai dekh sakta hun yha mai un req ka jawab dera hun  // basically yha yeh check hora hai ki iso ko aarakhi hai na  ye request jo login ho rakha hai pta chale koi hor aake accept kar rha ho apne aap
         status:"interested", //jinhone mujhpe interest dikhaya hai
-    })
+    }).populate("fromUserId","name")
+
     if(!connectedReq){
         res.status(400).status("there no coonnection req")
     }
-     
+     if(!connectedReq){
+        throw new Error("this request cannot be updated cause this request is may be not for you")
+     }
+
     connectedReq.status = status;
     
-    const data = await connectedReq.save();
+    await connectedReq.save();
     res
     .status(400)
     .json({message:"connection req " + status})
@@ -86,11 +90,35 @@ requestRouter.post("/request/review/:status/:requestId",userAuth,async(req,res)=
 
 }
 })
-module.exports = requestRouter;
+
 
 //writing logic some time you have to learn
 
+requestRouter.get("/view/connection",userAuth,async(req,res)=>{
+    try{
+        const loggedInUser = req.user;
+        const connections = await connectionReq.find({
+            $or:[
+                {fromUserId:loggedInUser._id,status:"accepted"},
+                {toUserId:loggedInUser._id,status:"accepted"}
+            ]
+        }).populate("fromUserId","name age")
+          .populate("toUserId","name age")
 
+        const data = connections.map((ele)=>{
+            if(ele.fromUserId._id.toString() == loggedInUser._id.toString()){ //we converted it to toString cause  before it id was mongodb objectIdType
+                return toUserId
+            }
+             return ele.fromUserId;
+        })
+
+        res.json(data);
+    }catch(err){
+        res.status(400).send(err.message)
+    }
+})
+
+module.exports = requestRouter;
 //part 2 notes
 
 /*thought process of writing post api is different than thought process of writing get api 
