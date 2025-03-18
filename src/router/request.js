@@ -118,7 +118,60 @@ requestRouter.get("/view/connection",userAuth,async(req,res)=>{
     }
 })
 
+requestRouter.get("/feed",userAuth,async(req,res)=>{
+    try{
+       const loggedInUser = req.user;
+       const connectionRequest = await connectionReq.find({
+        $or:[
+            {fromUserId:loggedInUser._id},
+            {toUserId:loggedInUser._id}
+        ]
+       },"fromUserId toUserId")
+     
+       const hideUsersFromFeed = new Set; //set is an array which takes takes only unique value ni duplicate allowed
+       connectionRequest.forEach(element => {
+        hideUsersFromFeed.add(element.fromUserId.toString());
+        hideUsersFromFeed.add(element.toUserId.toString());
+       });
+       console.log(hideUsersFromFeed)
+
+       const user = await Users.find({
+        $and:[
+            {_id:{$nin: Array.from(hideUsersFromFeed)}},
+            {_id:{$ne: loggedInUser._id}}
+        ] 
+       },"name age gender "
+       )
+       //find all the user with id and id shouldnot be present in array  finding all the people whose id is not present in hideuser array
+       res.send(user)
+    }catch(err){
+        res.status(400).send(err.message)
+    }
+})
+
 module.exports = requestRouter;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //part 2 notes
 
 /*thought process of writing post api is different than thought process of writing get api 
