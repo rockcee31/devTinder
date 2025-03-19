@@ -92,6 +92,8 @@ requestRouter.post("/request/review/:status/:requestId",userAuth,async(req,res)=
 })
 
 
+//if you are in page5 and you have lomuited date and till page 5 skip value will skip all the data and there will be nothing to display
+
 //writing logic some time you have to learn
 
 requestRouter.get("/view/connection",userAuth,async(req,res)=>{
@@ -121,6 +123,13 @@ requestRouter.get("/view/connection",userAuth,async(req,res)=>{
 requestRouter.get("/feed",userAuth,async(req,res)=>{
     try{
        const loggedInUser = req.user;
+       const page = parseInt(req.query.page)||1;//if you dont get page from query than assume page no as 1
+       //req.params will not work here i have to do req.query cause params means when req comes like this /feed/:params but in this req we are passing the value in query "/feed/?query"
+       let limit = parseInt(req.query.limit)||10;
+       // suppose you have large db and user is at page 1 and and he set its  limit to get all the data that query will take forever time and it will be very tough for database it can hang our database server
+       limit= limit>50?50:limit; //validating do if user trry to get all the data db will not hang
+
+       const forget = (page-1) * limit;
        const connectionRequest = await connectionReq.find({
         $or:[
             {fromUserId:loggedInUser._id},
@@ -140,8 +149,7 @@ requestRouter.get("/feed",userAuth,async(req,res)=>{
             {_id:{$nin: Array.from(hideUsersFromFeed)}},
             {_id:{$ne: loggedInUser._id}}
         ] 
-       },"name age gender "
-       )
+       },"name age gender").skip(forget).limit(limit);
        //find all the user with id and id shouldnot be present in array  finding all the people whose id is not present in hideuser array
        res.send(user)
     }catch(err){
