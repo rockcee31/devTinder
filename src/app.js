@@ -9,6 +9,14 @@ const {authRouter} = require("./router/auth")
 const {profileRouter} = require("./router/profile")
 const cookieParser = require('cookie-parser');
 const requestRouter = require("./router/request")
+const cors = require('cors');
+
+// app.options("*", cors());  // Enable CORS preflight for all routes
+
+app.use(cors({
+    origin:"http://localhost:5175/",
+    credentials:true
+}))
 app.use(express.json())
 app.use(cookieParser())
 
@@ -41,7 +49,7 @@ app.use("/",requestRouter);
 
 //get single user from db
 app.get("/user",async (req,res)=>{
-    const emailId = req.body
+    const emailId = req.params
     try{
          const user = await User.findOne(emailId);
         if(user.length == 0){
