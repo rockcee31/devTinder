@@ -152,6 +152,7 @@ app.get("/user",async (req,res)=>{
     }
 })
 
-
+create connections and request component
+crate connections slice
 
  */

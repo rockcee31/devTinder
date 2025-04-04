@@ -9,7 +9,9 @@ const userAuth = async(req,res,next)=>{
    try{
    const cookie = req.cookies;
    const {token} = cookie;
-
+   if(!token){
+    return res.status(401).send("Please Login")
+   }
   const decodedMessage =  jwt.verify(token,"DEV@Tinder");
 //   console.log(decodedMessage)
   const {_id} = decodedMessage;
@@ -17,7 +19,7 @@ const userAuth = async(req,res,next)=>{
    req.user = user;
    next()
    }catch(err){
-       res.status(200).send("you are not loggedIn")
+       res.status(401).send("you are not loggedIn")
    }
 }
 

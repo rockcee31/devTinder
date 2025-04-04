@@ -6,11 +6,10 @@ const validateProfileEdit = (req) =>{
    if (Object.keys(req.body).length === 0) {
       throw new Error("No fields provided for update");
   }
-    const allowedUpdates = ["name","age","skills","gender"];
+    const allowedUpdates = ["name","age","skills","gender","photoUrl"];
     const allowed = Object.keys(req.body).every((key)=> allowedUpdates.includes(key))
-     if(!allowed){
-        throw new Error("cannot edit somee fields")
-     }
+     
+    return allowed;
 }
 
 const validateProfilePassword = (req)=>{
