@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 const userAuth = require("../middleware/auth");
 const connectionReq = require("../models/connectionreq");
 const Users = require("../models/user");
@@ -6,122 +6,103 @@ const Users = require("../models/user");
 
 const requestRouter = express.Router();
 
-requestRouter.post("/request/send/:status/:toUserId",userAuth,async(req,res) =>{
-    try{
-    const fromUserId = req.user._id;
-    const toUserId = req.params.toUserId;
-    const status = req.params.status;
-   
-    const isallowedUpdates = ["interested","ignored"];
-        if(!isallowedUpdates.includes(status)){
-            return res.status(400).json({error: "Status is not valid" });
-        }
-    
-    const existingConnection = await connectionReq.findOne({
-        $or:[//If either condition is true, MongoDB returns a result.
-            {
-                fromUserId,
-                toUserId
-            },
-            {
-                fromUserId:toUserId,
-                toUserId:fromUserId
-            }
-        ]
-    })
+requestRouter.post(
+  "/request/send/:status/:toUserId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const fromUserId = req.user._id;
+      const toUserId = req.params.toUserId;
+      const status = req.params.status;
 
-    if(existingConnection){
-        res.json({
-            message: "Connection already exists",
-        })
-    }
-   
-    const toUserExist = await Users.findById(toUserId);
-    if(!toUserExist){
-        res.send("User already exist")
-    }
+      const isallowedUpdates = ["interested", "ignored"];
+      if (!isallowedUpdates.includes(status)) {
+        return res.status(400).json({ error: "Status is not valid type" });
+      }
 
-    const Request = new connectionReq({
+      const existingConnectionRequest = await connectionReq.findOne({
+        $or: [
+          //If either condition is true, MongoDB returns a result.
+          {
+            fromUserId,
+            toUserId,
+          },
+          {
+            fromUserId: toUserId,
+            toUserId: fromUserId,
+          },
+        ],
+      });
+
+      if (existingConnectionRequest) {
+        throw new Error("connection already exist");
+      }
+
+      const toUserExist = await Users.findById(toUserId);
+      if (!toUserExist) {
+        throw new Error("user does not exist");
+      }
+
+      const connectionRequest = new connectionReq({
         fromUserId,
         toUserId,
-        status
-    })
-    await Request.save();
-    res.send("connection req send sucessfully")
-}catch(err){
-    res.status(400).send("can not send connection send request"+ err.message)
+        status,
+      })
+      await connectionRequest.save();
+
     
-}
 
-
-})//jab  bhi  connection req bhejega to uska ek alag obj banega or us obj ko ek id mil jayegi or obj user ke follow req feed mai chala jayega fir jaake hammara niche walla api cha;ega agar user accept or reject req bhejega status ko update karne ke lliye tabhi niche request  Id wo obj id hai
-
-
-requestRouter.post("/request/review/:status/:requestId",userAuth,async(req,res)=>{  //this one is for receiver i am reveiwing connection request i can either reject it or accept it with api we are making  to create a api you have to first think of route and than miidleware 
-    try{
-        const loggedInUser = req.user;//logginIn user is the guy who is seing the req came to him means we have to see that connection req where to userId  is of loggedIn user
-    const {status,requestId} = req.params; //user ko request to saari dikh rahi hai jha logo ne uspe interest show kiya hai yha user jaisi he click karege accept or reject ui pe wo request aajayegi iss api pe jha requestId hogi us object ki Id 
-    const allowedUpdates = ["accepted","rejected"]; //for user to  review there will to option either reject or request and also before reveiw the requset should be in intersted status than only user can accept or reject it and if connection req  in ignored state no body can accept or reject it
-    if(!allowedUpdates.includes(status)){
-        return res.status(400).json({message:"status not allowed"})
+      res.send("connection req send sucessfully");
+    } catch (err) {
+      res
+        .status(400)
+        .send("can not send connection request because" + " " + err.message);
     }
-    
-    const connectedReq = await connectionReq.findOne({
-        _id: requestId, //id of request in database that from user sent to user jab kisi ne user  ne request bheji hogi tab database mai ek object bana hoga req  intersted in user ab wo obj  dusre ke ui mai show hui hogi yha wo user us req id object ka status change kar rha hai either he is rejecting it or accepting it 
-        toUserId : loggedInUser._id,//touser should be the login user that guy only can accept req came to him  mai loggedin user hun means data mai jha to user mai hun wo saari req mai dekh sakta hun yha mai un req ka jawab dera hun  // basically yha yeh check hora hai ki iso ko aarakhi hai na  ye request jo login ho rakha hai pta chale koi hor aake accept kar rha ho apne aap
-        status:"interested", //jinhone mujhpe interest dikhaya hai
-    }).populate("fromUserId","name")
+  }
+); //jab  bhi  connection req bhejega to uska ek alag obj banega or us obj ko ek id mil jayegi or obj user ke follow req feed mai chala jayega fir jaake hammara niche walla api cha;ega agar user accept or reject req bhejega status ko update karne ke lliye tabhi niche request  Id wo obj id hai
 
-    if(!connectedReq){
-        res.status(400).status("there no coonnection req")
+requestRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    //this one is for receiver i am reveiwing connection request i can either reject it or accept it with api we are making  to create a api you have to first think of route and than miidleware
+    try {
+      const loggedInUser = req.user; //logginIn user is the guy who is seing the req came to him means we have to see that connection req where to userId  is of loggedIn user
+      const { status, requestId } = req.params; //user ko request to saari dikh rahi hai jha logo ne uspe interest show kiya hai yha user jaisi he click karege accept or reject ui pe wo request aajayegi iss api pe jha requestId hogi us object ki Id
+      const allowedUpdates = ["accepted", "rejected"]; //for user to  review there will to option either reject or request and also before reveiw the requset should be in intersted status than only user can accept or reject it and if connection req  in ignored state no body can accept or reject it
+      if (!allowedUpdates.includes(status)) {
+        return res.status(400).json({ message: "status not allowed" });
+      }
+
+      const Req = await connectionReq
+        .findOne({
+          _id: requestId, //id of request in database that from user sent to user jab kisi ne user  ne request bheji hogi tab database mai ek object bana hoga req  intersted in user ab wo obj  dusre ke ui mai show hui hogi yha wo user us req id object ka status change kar rha hai either he is rejecting it or accepting it
+          toUserId: loggedInUser._id, //touser should be the login user that guy only can accept req came to him  mai loggedin user hun means data mai jha to user mai hun wo saari req mai dekh sakta hun yha mai un req ka jawab dera hun  // basically yha yeh check hora hai ki iso ko aarakhi hai na  ye request jo login ho rakha hai pta chale koi hor aake accept kar rha ho apne aap
+          status: "interested", //jinhone mujhpe interest dikhaya hai
+        })
+        .populate("fromUserId", "name");
+
+      if (!Req) {
+        throw new Error(
+          "this request cannot be updated cause this request is may be not for you"
+        );
+      }
+
+      Req.status = status;
+
+      await Req.save();
+      res.status(200).json({ message: "connection req " + status });
+    } catch (err) {
+      res.status(400).send("ERROR:" + err.message); //jaise he user ese connection req bhejta hai is ki request tab mai wo saari request aajayegi reqid ke saath bss uska status update kar rha hai loggedIN user
     }
-     if(!connectedReq){
-        throw new Error("this request cannot be updated cause this request is may be not for you")
-     }
-
-    connectedReq.status = status;
-    
-    await connectedReq.save();
-    res
-    .status(400)
-    .json({message:"connection req " + status})
-}catch(err){
-        res.status(400).send("ERROR:"+ err.message); //jaise he user ese connection req bhejta hai is ki request tab mai wo saari request aajayegi reqid ke saath bss uska status update kar rha hai loggedIN user
-
-}
-})
-
+  }
+);
 
 //if you are in page5 and you have lomuited date and till page 5 skip value will skip all the data and there will be nothing to display
 
 //writing logic some time you have to learn
 
-
-
-
-
 module.exports = requestRouter;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //part 2 notes
 

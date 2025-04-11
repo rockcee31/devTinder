@@ -54,7 +54,6 @@ const userSchema = new mongoose.Schema(
         validator: (value) => validator.isURL(value),
         message: "Invalid URL format.",
       },
-      default:"https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-male-user-profile-vector-illustration-isolated-background-man-profile-sign-business-concept_157943-38764.jpg?semt=ais_hybrid",
     },
     about: {
       type: String,
